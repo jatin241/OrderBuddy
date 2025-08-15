@@ -1,0 +1,255 @@
+.home-container {
+  font-family: Arial, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e67e22;
+}
+
+.nav-links .nav-btn {
+  margin-left: 15px;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: #333;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.nav-links .nav-btn:hover {
+  background-color: #f8f8f8;
+}
+
+.nav-links .register {
+  background-color: #e67e22;
+  color: white;
+}
+
+.nav-links .register:hover {
+  background-color: #cf6f1d;
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 40px;
+  flex-wrap: wrap;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.highlight {
+  color: #e67e22;
+}
+
+.hero-text p {
+  font-size: 1rem;
+  margin-bottom: 25px;
+  color: #555;
+}
+
+.hero-buttons .btn-primary,
+.hero-buttons .btn-secondary {
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #e67e22;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #cf6f1d;
+}
+
+.btn-secondary {
+  border: 2px solid #e67e22;
+  color: #e67e22;
+}
+
+.btn-secondary:hover {
+  background-color: #e67e22;
+  color: white;
+}
+
+/* Hero Image */
+.hero-image img {
+  max-width: 400px;
+  border-radius: 8px;
+}
+
+/* Flow Chart Section */
+.flow-chart {
+  background-color: #fff7f0;
+  padding: 50px 40px;
+  text-align: center;
+}
+
+.flow-chart h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.flow-steps {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.step {
+  text-align: center;
+  max-width: 180px;
+  position: relative;
+}
+
+/* Circle Icon Style */
+.step-icon {
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e67e22;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Connector Arrows for Desktop */
+@media (min-width: 768px) {
+  .step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 30px; /* Align vertically with icon center */
+    right: -35px; /* Shift toward the next icon */
+    width: 40px;
+    height: 2px;
+    background-color: #e67e22;
+
+    /* Arrow effect */
+    clip-path: polygon(0 0, 90% 0, 90% -4px, 100% 50%, 90% 100%, 90% calc(100% + 4px), 0 100%);
+  }
+}
+/* Navbar dropdown */
+.navbar .dropdown {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.navbar .dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%; /* below the button */
+  right: 0;
+  background-color: #fff;
+  min-width: 250px; /* width of orders block */
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+/* Show dropdown on hover */
+.navbar .dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Optional: style the MyOrders inside dropdown */
+.dropdown-content h2 {
+  margin-top: 0;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.dropdown-content {
+  font-size: 14px;
+}
+/* Navbar dropdown */
+.navbar .dropdown {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.navbar .dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%; /* below the button */
+  right: 0;
+  background-color: #fff;
+  width: 300px; /* fixed width for dropdown */
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+/* Show dropdown on hover */
+.navbar .dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* MyOrders mini card style */
+.dropdown-content .order-card {
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.dropdown-content .order-card:hover {
+  transform: translateY(-2px);
+}
+
+.dropdown-content .order-card p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.dropdown-content h2 {
+  margin-top: 0;
+  font-size: 16px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+

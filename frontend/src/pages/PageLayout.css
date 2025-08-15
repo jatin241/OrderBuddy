@@ -1,0 +1,50 @@
+/* Shared page layout styling for all non-home pages */
+
+.page-container {
+  font-family: Arial, sans-serif;
+  padding: 60px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.page-container h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.page-container p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.page-button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+}
+
+/* Match Home page button colors */
+.page-button.primary {
+  background-color: #e67e22;
+  color: white;
+}
+
+.page-button.primary:hover {
+  background-color: #cf6f1d;
+}
+
+.page-button.secondary {
+  border: 2px solid #e67e22;
+  color: #e67e22;
+}
+
+.page-button.secondary:hover {
+  background-color: #e67e22;
+  color: white;
+}
