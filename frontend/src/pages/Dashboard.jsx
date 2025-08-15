@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import Notifications from "./Notifications"; // new component for buddy requests
+import { Bell } from "lucide-react"; // install lucide-react if not already
 import "./PageLayout.css";
 import "leaflet/dist/leaflet.css";
 
@@ -20,7 +22,9 @@ export default function Dashboard() {
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId"); // logged-in user id
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,23 +74,49 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  // Buddy Up function (fixed)
+  const handleBuddyUp = async (orderId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/orders/buddy-request/${orderId}`,
+        {}, // backend already identifies requester & receiver
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert(res.data.message); // success feedback
+    } catch (err) {
+      console.error("Buddy request error:", err.response?.data || err.message);
+      alert("Failed to send buddy request");
+    }
+  };
+
   if (loading) return <div className="page-container"><p>Loading orders...</p></div>;
   if (error) return <div className="page-container"><p style={{ color: "red" }}>{error}</p></div>;
 
   return (
     <div className="page-container">
-      <h1>Dashboard</h1>
+      {/* Top Bar with Dashboard title & bell */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>Dashboard</h1>
+        <div style={{ position: "relative" }}>
+          <Bell
+            size={24}
+            style={{ cursor: "pointer" }}
+            onClick={() => setShowNotifications(!showNotifications)}
+          />
+          {showNotifications && (
+            <div className="notifications-dropdown">
+              <Notifications />
+            </div>
+          )}
+        </div>
+      </div>
+
       <p>{message}</p>
 
       <div style={{ marginBottom: "20px" }}>
-        <Link to="/share-order" className="page-button primary">
-          Share a New Order
-        </Link>
-        <button
-          className="page-button secondary"
-          style={{ marginLeft: "10px" }}
-          onClick={() => navigate("/")}
-        >
+        <Link to="/share-order" className="page-button primary">Share a New Order</Link>
+        <button className="page-button secondary" style={{ marginLeft: "10px" }} onClick={() => navigate("/")}>
           Home
         </button>
       </div>
@@ -114,6 +144,17 @@ export default function Dashboard() {
                 <p><strong>Shared By:</strong> {order.sharedBy?.name || "Unknown"}</p>
                 <p><strong>Distance:</strong> {(order.distance / 1000).toFixed(2)} km</p>
                 <p><strong>Address:</strong> {order.location?.address || "Address not available"}</p>
+
+                {/* Buddy Up Button */}
+                {order.sharedBy?._id !== userId && (
+                  <button
+                    className="page-button primary"
+                    style={{ marginTop: "10px" }}
+                    onClick={() => handleBuddyUp(order._id)}
+                  >
+                    Buddy Up
+                  </button>
+                )}
               </div>
             ))}
           </div>

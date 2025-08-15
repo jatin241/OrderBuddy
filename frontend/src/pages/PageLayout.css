@@ -48,3 +48,16 @@
   background-color: #e67e22;
   color: white;
 }
+.notifications-dropdown {
+  position: absolute;
+  top: 28px; /* adjust depending on bell size */
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
