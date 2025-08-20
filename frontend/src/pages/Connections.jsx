@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "./Connections.css";
 
 export default function Connections() {
   const [connections, setConnections] = useState([]);
@@ -21,20 +22,20 @@ export default function Connections() {
   }, []);
 
   return (
-    <div>
-      <h2>My Connections</h2>
+    <div className="connections-container">
+      <h2 className="connections-title">My Connections</h2>
       {connections.length > 0 ? (
-        <ul>
+        <ul className="connections-list">
           {connections.map((conn) => (
-            <li key={conn._id}>
-              <strong>Name:</strong> {conn.name} <br />
-              <strong>Email:</strong> {conn.email} <br />
-              <strong>Phone:</strong> {conn.phone || "N/A"}
+            <li key={conn._id} className="connection-card">
+              <p><strong>Name:</strong> {conn.name}</p>
+              <p><strong>Email:</strong> {conn.email}</p>
+              <p><strong>Phone:</strong> {conn.phone || "N/A"}</p>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No connections yet.</p>
+        <p className="no-connections">No connections yet.</p>
       )}
     </div>
   );

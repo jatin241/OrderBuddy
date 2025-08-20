@@ -130,105 +130,106 @@ export default function Home() {
               <a href="/join-orders" className="nav-btn">Join Orders</a>
               <a href="/connections" className="nav-btn">Connections</a>
 
-              {/* Notification Bell */}
-              <div
-                className="nav-btn notification"
-                style={{ position: "relative", cursor: "pointer" }}
-                ref={dropdownRef}
-              >
-                <span onClick={() => setShowDropdown(!showDropdown)}>🔔</span>
-                {requests.length > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-5px",
-                      right: "-5px",
-                      backgroundColor: "red",
-                      color: "white",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {requests.length}
-                  </span>
-                )}
+      {/* Notification Bell */}
+<div
+  className="nav-btn notification"
+  style={{ position: "relative", cursor: "pointer" }}
+  ref={dropdownRef} // ✅ Wrap bell + dropdown together
+>
+  <span onClick={() => setShowDropdown(!showDropdown)}>🔔</span>
+  {requests.length > 0 && (
+    <span
+      style={{
+        position: "absolute",
+        top: "-5px",
+        right: "-5px",
+        backgroundColor: "red",
+        color: "white",
+        borderRadius: "50%",
+        padding: "2px 6px",
+        fontSize: "12px",
+      }}
+    >
+      {requests.length}
+    </span>
+  )}
 
-                {/* Dropdown */}
-                {showDropdown && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "25px",
-                      right: "0",
-                      backgroundColor: "#fff",
-                      boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-                      borderRadius: "6px",
-                      zIndex: 100,
-                      width: "240px",
-                    }}
-                  >
-                    {requests.length === 0 ? (
-                      <p style={{ padding: "10px" }}>No new requests</p>
-                    ) : (
-                      requests.map((req) => (
-                        <div
-                          key={req._id}
-                          style={{
-                            padding: "8px 10px",
-                            borderBottom: "1px solid #ddd",
-                          }}
-                        >
-                          <p style={{ margin: "0 0 5px 0" }}>
-                            {req.senderName || "Unknown User"} wants to join your order.
-                          </p>
+  {/* Dropdown */}
+  {showDropdown && (
+    <div
+      style={{
+        position: "absolute",
+        top: "25px",
+        right: "0",
+        backgroundColor: "#fff",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+        borderRadius: "6px",
+        zIndex: 100,
+        width: "240px",
+      }}
+    >
+      {requests.length === 0 ? (
+        <p style={{ padding: "10px" }}>No new requests</p>
+      ) : (
+        requests.map((req) => (
+          <div
+            key={req._id}
+            style={{
+              padding: "8px 10px",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <p style={{ margin: "0 0 5px 0" }}>
+              {req.senderName || "Unknown User"} wants to join your order.
+            </p>
 
-                          {showContactFormFor === req._id ? (
-                            <div>
-                              <input
-                                type="email"
-                                placeholder="Your email"
-                                value={contactInfo.email || userEmail}
-                                onChange={(e) =>
-                                  setContactInfo({ ...contactInfo, email: e.target.value })
-                                }
-                                style={{ width: "100%", marginBottom: "5px" }}
-                              />
-                              <input
-                                type="text"
-                                placeholder="Your phone"
-                                value={contactInfo.phone || ""}
-                                onChange={(e) =>
-                                  setContactInfo({ ...contactInfo, phone: e.target.value })
-                                }
-                                style={{ width: "100%", marginBottom: "5px" }}
-                              />
-                              <button
-                                onClick={() => handleAccept(req._id, contactInfo)}
-                                style={{ marginRight: "5px" }}
-                              >
-                                Submit
-                              </button>
-                              <button onClick={() => setShowContactFormFor(null)}>
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setShowContactFormFor(req._id)}
-                              style={{ marginRight: "5px" }}
-                            >
-                              Accept
-                            </button>
-                          )}
-
-                          <button onClick={() => handleReject(req._id)}>Reject</button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
+            {showContactFormFor === req._id ? (
+              <div>
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={contactInfo.email || userEmail}
+                  onChange={(e) =>
+                    setContactInfo({ ...contactInfo, email: e.target.value })
+                  }
+                  style={{ width: "100%", marginBottom: "5px" }}
+                />
+                <input
+                  type="text"
+                  placeholder="Your phone"
+                  value={contactInfo.phone || ""}
+                  onChange={(e) =>
+                    setContactInfo({ ...contactInfo, phone: e.target.value })
+                  }
+                  style={{ width: "100%", marginBottom: "5px" }}
+                />
+                <button
+                  onClick={() => handleAccept(req._id, contactInfo)}
+                  style={{ marginRight: "5px" }}
+                >
+                  Submit
+                </button>
+                <button onClick={() => setShowContactFormFor(null)}>
+                  Cancel
+                </button>
               </div>
+            ) : (
+              <button
+                onClick={() => setShowContactFormFor(req._id)}
+                style={{ marginRight: "5px" }}
+              >
+                Accept
+              </button>
+            )}
+
+            <button onClick={() => handleReject(req._id)}>Reject</button>
+          </div>
+        ))
+      )}
+    </div>
+  )}
+</div>
+
 
               {/* My Orders dropdown */}
               <div className="nav-btn dropdown">

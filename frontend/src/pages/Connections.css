@@ -1,0 +1,52 @@
+.connections-container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.connections-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.connections-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.connection-card {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.connection-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+}
+
+.connection-card p {
+  margin: 8px 0;
+  font-size: 15px;
+  color: #444;
+}
+
+.connection-card span {
+  font-weight: 600;
+  color: #222;
+}
+
+.no-connections {
+  text-align: center;
+  font-size: 16px;
+  color: #777;
+  margin-top: 30px;
+}
