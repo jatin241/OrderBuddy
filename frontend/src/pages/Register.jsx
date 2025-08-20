@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import "./pageLayout.css";
+import { useNavigate, Link } from "react-router-dom";
+import "./Auth.css"; // Import shared authentication styles
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -31,49 +31,60 @@ export default function Register() {
   };
 
   return (
-    <div className="page-container">
-      <h1 className="page-title">Register</h1>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h1 className="auth-title">Register</h1>
 
-      {message && <p className="message">{message}</p>}
+        {message && <p className="message">{message}</p>}
 
-      <form onSubmit={handleSubmit} className="form-container">
-        <div className="form-group">
-          <label>Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="input-field"
+            />
+          </div>
 
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="input-field"
+            />
+          </div>
 
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="input-field"
+            />
+          </div>
 
-        <button type="submit" className="btn-primary">
-          Register
-        </button>
-      </form>
+          <button type="submit" className="submit-button">
+            Register
+          </button>
+        </form>
+        <p className="auth-link">
+          Already have an account? <Link to="/login">Login here</Link>
+        </p>
+      </div>
     </div>
   );
 }

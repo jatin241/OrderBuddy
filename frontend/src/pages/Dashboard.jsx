@@ -76,22 +76,33 @@ export default function Dashboard() {
 
   // Buddy Up function (fixed)
   const handleBuddyUp = async (orderId) => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await axios.post(
-        `http://localhost:5000/api/orders/buddy-request/${orderId}`,
-        {}, // backend already identifies requester & receiver
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert(res.data.message); // success feedback
-    } catch (err) {
-      console.error("Buddy request error:", err.response?.data || err.message);
-      alert("Failed to send buddy request");
-    }
-  };
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      `http://localhost:5000/api/orders/buddy-request/${orderId}`, // 👈 orderId in URL
+      {}, // no body needed
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert(res.data.message);
+  } catch (err) {
+    console.error("Buddy request error:", err.response?.data || err.message);
+    alert(err.response?.data?.message || "Failed to send buddy request");
+  }
+};
 
-  if (loading) return <div className="page-container"><p>Loading orders...</p></div>;
-  if (error) return <div className="page-container"><p style={{ color: "red" }}>{error}</p></div>;
+
+  if (loading)
+    return (
+      <div className="page-container">
+        <p>Loading orders...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="page-container">
+        <p style={{ color: "red" }}>{error}</p>
+      </div>
+    );
 
   return (
     <div className="page-container">
@@ -115,8 +126,14 @@ export default function Dashboard() {
       <p>{message}</p>
 
       <div style={{ marginBottom: "20px" }}>
-        <Link to="/share-order" className="page-button primary">Share a New Order</Link>
-        <button className="page-button secondary" style={{ marginLeft: "10px" }} onClick={() => navigate("/")}>
+        <Link to="/share-order" className="page-button primary">
+          Share a New Order
+        </Link>
+        <button
+          className="page-button secondary"
+          style={{ marginLeft: "10px" }}
+          onClick={() => navigate("/")}
+        >
           Home
         </button>
       </div>
@@ -135,15 +152,25 @@ export default function Dashboard() {
                   padding: "15px",
                   borderRadius: "8px",
                   backgroundColor: "#f9f9f9",
-                  textAlign: "left"
+                  textAlign: "left",
                 }}
               >
                 <h4>{order.restaurant}</h4>
-                <p><strong>Items:</strong> {order.items.join(", ")}</p>
-                <p><strong>Delivery Time:</strong> {order.deliveryTime || "Not specified"}</p>
-                <p><strong>Shared By:</strong> {order.sharedBy?.name || "Unknown"}</p>
-                <p><strong>Distance:</strong> {(order.distance / 1000).toFixed(2)} km</p>
-                <p><strong>Address:</strong> {order.location?.address || "Address not available"}</p>
+                <p>
+                  <strong>Items:</strong> {order.items.join(", ")}
+                </p>
+                <p>
+                  <strong>Delivery Time:</strong> {order.deliveryTime || "Not specified"}
+                </p>
+                <p>
+                  <strong>Shared By:</strong> {order.sharedBy?.name || "Unknown"}
+                </p>
+                <p>
+                  <strong>Distance:</strong> {(order.distance / 1000).toFixed(2)} km
+                </p>
+                <p>
+                  <strong>Address:</strong> {order.location?.address || "Address not available"}
+                </p>
 
                 {/* Buddy Up Button */}
                 {order.sharedBy?._id !== userId && (
@@ -174,11 +201,13 @@ export default function Dashboard() {
               {orders.map((order) => (
                 <Marker
                   key={order._id}
-                  position={[order.location.coordinates[1], order.location.coordinates[0]]} // [lat, lng]
+                  position={[order.location.coordinates[1], order.location.coordinates[0]]}
                 >
                   <Popup>
-                    <strong>{order.restaurant}</strong><br />
-                    {order.location?.address || "Address not available"}<br />
+                    <strong>{order.restaurant}</strong>
+                    <br />
+                    {order.location?.address || "Address not available"}
+                    <br />
                     Distance: {(order.distance / 1000).toFixed(2)} km
                   </Popup>
                 </Marker>

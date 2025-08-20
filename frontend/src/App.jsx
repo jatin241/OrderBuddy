@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import ShareOrder from "./pages/ShareOrder";
+import Connections from "./pages/Connections"; 
 //import MyOrders from "./components/MyOrders";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/share-order" element={<ShareOrder />} />
+        <Route path="/connections" element={<Connections />} />
         
         <Route
   path="/dashboard"

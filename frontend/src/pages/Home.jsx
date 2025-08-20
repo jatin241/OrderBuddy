@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import MyOrders from "./MyOrders";
@@ -7,7 +7,11 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [requests, setRequests] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showContactFormFor, setShowContactFormFor] = useState(null);
+  const [contactInfo, setContactInfo] = useState({ email: "", phone: "" });
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const token = localStorage.getItem("token");
 
@@ -19,10 +23,27 @@ export default function Home() {
     return () => window.removeEventListener("storage", syncAuth);
   }, []);
 
+  // Fetch logged-in user's email for pre-filling
+  useEffect(() => {
+    if (!token) return;
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/protected", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch user info");
+        const data = await res.json();
+        setUserEmail(data.user?.email || "");
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchUser();
+  }, [token]);
+
   // Fetch pending buddy requests
   useEffect(() => {
     if (!token) return;
-
     const fetchRequests = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/orders/buddy-requests", {
@@ -35,30 +56,42 @@ export default function Home() {
         console.error(err);
       }
     };
-
     fetchRequests();
   }, [token]);
 
-  // Accept/Reject buddy requests
-  const handleAccept = async (requestId) => {
+  // Accept buddy request
+  const handleAccept = async (requestId, contactInfo) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/buddy-requests/${requestId}/accept`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/orders/buddy-requests/${requestId}/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(contactInfo),
+        }
+      );
       if (!res.ok) throw new Error("Failed to accept request");
       setRequests(requests.filter((req) => req._id !== requestId));
+      setShowContactFormFor(null);
+      setContactInfo({ email: "", phone: "" });
     } catch (err) {
       console.error(err);
     }
   };
 
+  // Reject buddy request
   const handleReject = async (requestId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/buddy-requests/${requestId}/reject`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/orders/buddy-requests/${requestId}/reject`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (!res.ok) throw new Error("Failed to reject request");
       setRequests(requests.filter((req) => req._id !== requestId));
     } catch (err) {
@@ -66,13 +99,25 @@ export default function Home() {
     }
   };
 
-  // Logout function
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     setIsLoggedIn(false);
-    navigate("/"); // redirect to homepage
+    navigate("/");
   };
+
+  // ✅ Close dropdown if clicked outside (but keep form clickable)
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+        setShowContactFormFor(null); // also close any form
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="home-container">
@@ -83,14 +128,15 @@ export default function Home() {
           {isLoggedIn ? (
             <>
               <a href="/join-orders" className="nav-btn">Join Orders</a>
+              <a href="/connections" className="nav-btn">Connections</a>
 
               {/* Notification Bell */}
               <div
                 className="nav-btn notification"
-                onClick={() => setShowDropdown(!showDropdown)}
                 style={{ position: "relative", cursor: "pointer" }}
+                ref={dropdownRef}
               >
-                🔔
+                <span onClick={() => setShowDropdown(!showDropdown)}>🔔</span>
                 {requests.length > 0 && (
                   <span
                     style={{
@@ -119,7 +165,7 @@ export default function Home() {
                       boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
                       borderRadius: "6px",
                       zIndex: 100,
-                      width: "220px",
+                      width: "240px",
                     }}
                   >
                     {requests.length === 0 ? (
@@ -136,12 +182,46 @@ export default function Home() {
                           <p style={{ margin: "0 0 5px 0" }}>
                             {req.senderName || "Unknown User"} wants to join your order.
                           </p>
-                          <button
-                            onClick={() => handleAccept(req._id)}
-                            style={{ marginRight: "5px" }}
-                          >
-                            Accept
-                          </button>
+
+                          {showContactFormFor === req._id ? (
+                            <div>
+                              <input
+                                type="email"
+                                placeholder="Your email"
+                                value={contactInfo.email || userEmail}
+                                onChange={(e) =>
+                                  setContactInfo({ ...contactInfo, email: e.target.value })
+                                }
+                                style={{ width: "100%", marginBottom: "5px" }}
+                              />
+                              <input
+                                type="text"
+                                placeholder="Your phone"
+                                value={contactInfo.phone || ""}
+                                onChange={(e) =>
+                                  setContactInfo({ ...contactInfo, phone: e.target.value })
+                                }
+                                style={{ width: "100%", marginBottom: "5px" }}
+                              />
+                              <button
+                                onClick={() => handleAccept(req._id, contactInfo)}
+                                style={{ marginRight: "5px" }}
+                              >
+                                Submit
+                              </button>
+                              <button onClick={() => setShowContactFormFor(null)}>
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setShowContactFormFor(req._id)}
+                              style={{ marginRight: "5px" }}
+                            >
+                              Accept
+                            </button>
+                          )}
+
                           <button onClick={() => handleReject(req._id)}>Reject</button>
                         </div>
                       ))
@@ -159,7 +239,9 @@ export default function Home() {
               </div>
 
               {/* Logout Button */}
-              <button className="nav-btn logout" onClick={handleLogout}>Logout</button>
+              <button className="nav-btn logout" onClick={handleLogout}>
+                Logout
+              </button>
             </>
           ) : (
             <>
@@ -177,7 +259,7 @@ export default function Home() {
             Share Food Orders, <span className="highlight">Save Money</span>
           </h1>
           <p>
-            Join people nearby to share bulk discounts from Swiggy, Zomato & more.  
+            Join people nearby to share bulk discounts from Swiggy, Zomato & more.
             Order together, save together, and enjoy great food!
           </p>
           <div className="hero-buttons">

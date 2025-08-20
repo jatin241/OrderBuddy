@@ -166,21 +166,43 @@ router.get("/buddy-requests", authMiddleware, async (req, res) => {
   }
 });
 
-// Accept buddy request
+// Accept buddy request with contact info
 router.post("/buddy-requests/:id/accept", authMiddleware, async (req, res) => {
   try {
-    const request = await BuddyRequest.findById(req.params.id);
+    const { email, phone } = req.body; // NEW: contact info
+
+    const request = await BuddyRequest.findById(req.params.id)
+      .populate("sender", "name email phone")
+      .populate("receiver", "name email phone");
+
     if (!request) return res.status(404).json({ message: "Request not found" });
-    if (request.receiver.toString() !== req.user.id) {
+
+    if (request.receiver._id.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not authorized" });
     }
 
     request.status = "accepted";
+
+    // Save contact info for receiver
+    request.receiverContact = {
+      email: email || request.receiver.email,
+      phone: phone || request.receiver.phone,
+    };
+
     await request.save();
-    res.json({ message: "Buddy request accepted" });
+
+    res.json({
+      message: "Request accepted",
+      senderContact: {
+        name: request.sender.name,
+        email: request.sender.email,
+        phone: request.sender.phone,
+      },
+      receiverContact: request.receiverContact,
+    });
   } catch (err) {
     console.error("Error accepting buddy request:", err);
-    res.status(500).json({ message: "Failed to accept request" });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -188,6 +210,7 @@ router.post("/buddy-requests/:id/accept", authMiddleware, async (req, res) => {
 router.post("/buddy-requests/:id/reject", authMiddleware, async (req, res) => {
   try {
     const request = await BuddyRequest.findById(req.params.id);
+
     if (!request) return res.status(404).json({ message: "Request not found" });
     if (request.receiver.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not authorized" });
@@ -195,6 +218,7 @@ router.post("/buddy-requests/:id/reject", authMiddleware, async (req, res) => {
 
     request.status = "rejected";
     await request.save();
+
     res.json({ message: "Buddy request rejected" });
   } catch (err) {
     console.error("Error rejecting buddy request:", err);
