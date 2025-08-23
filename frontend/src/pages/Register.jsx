@@ -1,15 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import "./Auth.css"; // Import shared authentication styles
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false); // ✅ toggle state
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -31,58 +26,94 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1 className="auth-title">Register</h1>
+    <div className="min-h-screen flex items-center justify-center bg-orange-50 relative overflow-hidden">
+      {/* Food pattern SVG */}
+      <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="foodPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="3" fill="#F97316"/>
+            <circle cx="30" cy="30" r="3" fill="#F97316"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#foodPattern)" />
+      </svg>
 
-        {message && <p className="message">{message}</p>}
+      {/* Emoji decoration */}
+      <div className="absolute inset-0 flex flex-wrap items-center justify-center opacity-5 text-6xl">
+        <span className="m-4">🍕</span>
+        <span className="m-4">🍔</span>
+        <span className="m-4">🍟</span>
+        <span className="m-4">🌮</span>
+        <span className="m-4">🍣</span>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
+      {/* Register Card */}
+      <div className="w-full max-w-sm p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-xl z-10">
+        {/* Logo */}
+        <h1 className="text-3xl font-bold text-orange-500 text-center mb-6">OrderBuddy</h1>
+
+        {/* Message */}
+        {message && <p className="text-center text-red-500 mb-4">{message}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
             <input
               type="text"
-              id="name"
               name="name"
+              id="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="input-field"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
-              id="email"
               name="email"
+              id="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="input-field"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="input-field"
-            />
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
           </div>
 
-          <button type="submit" className="submit-button">
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-orange-500 text-white font-bold rounded-md hover:bg-orange-600 transition"
+          >
             Register
           </button>
         </form>
-        <p className="auth-link">
-          Already have an account? <Link to="/login">Login here</Link>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Already have an account? <Link to="/login" className="text-orange-500 font-semibold hover:underline">Login here</Link>
         </p>
       </div>
     </div>

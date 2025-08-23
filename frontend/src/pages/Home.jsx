@@ -1,45 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Home.css";
 import MyOrders from "./MyOrders";
+import "tailwindcss";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [requests, setRequests] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showContactFormFor, setShowContactFormFor] = useState(null);
-  const [contactInfo, setContactInfo] = useState({ email: "", phone: "" });
-  const [userEmail, setUserEmail] = useState("");
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  const [showOrdersDropdown, setShowOrdersDropdown] = useState(false);
+  const notifRef = useRef(null);
+  const ordersRef = useRef(null);
   const navigate = useNavigate();
-  const dropdownRef = useRef(null);
-
   const token = localStorage.getItem("token");
-
-  // Sync login state
-  useEffect(() => {
-    const syncAuth = () => setIsLoggedIn(!!localStorage.getItem("token"));
-    window.addEventListener("storage", syncAuth);
-    syncAuth();
-    return () => window.removeEventListener("storage", syncAuth);
-  }, []);
-
-  // Fetch logged-in user's email for pre-filling
-  useEffect(() => {
-    if (!token) return;
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/auth/protected", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch user info");
-        const data = await res.json();
-        setUserEmail(data.user?.email || "");
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchUser();
-  }, [token]);
 
   // Fetch pending buddy requests
   useEffect(() => {
@@ -59,47 +31,20 @@ export default function Home() {
     fetchRequests();
   }, [token]);
 
-  // Accept buddy request
-  const handleAccept = async (requestId, contactInfo) => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/orders/buddy-requests/${requestId}/accept`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(contactInfo),
-        }
-      );
-      if (!res.ok) throw new Error("Failed to accept request");
-      setRequests(requests.filter((req) => req._id !== requestId));
-      setShowContactFormFor(null);
-      setContactInfo({ email: "", phone: "" });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // Close dropdowns if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifDropdown(false);
+      }
+      if (ordersRef.current && !ordersRef.current.contains(event.target)) {
+        setShowOrdersDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  // Reject buddy request
-  const handleReject = async (requestId) => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/orders/buddy-requests/${requestId}/reject`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to reject request");
-      setRequests(requests.filter((req) => req._id !== requestId));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
@@ -107,191 +52,118 @@ export default function Home() {
     navigate("/");
   };
 
-  // ✅ Close dropdown if clicked outside (but keep form clickable)
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-        setShowContactFormFor(null); // also close any form
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
-    <div className="home-container">
+    <div className="font-sans bg-gray-50 min-h-screen">
       {/* Navbar */}
-      <nav className="navbar">
-        <div className="logo">OrderBuddy</div>
-        <div className="nav-links">
+      <nav className="flex justify-between items-center px-6 py-4 bg-white shadow-md">
+        <div className="logo text-orange-500 font-bold text-xl cursor-pointer" onClick={() => navigate("/")}>
+          OrderBuddy
+        </div>
+
+        <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <>
-              <a href="/join-orders" className="nav-btn">Join Orders</a>
-              <a href="/connections" className="nav-btn">Connections</a>
+              <a href="/join-orders" className="nav-btn px-3 py-1 text-gray-700 hover:text-orange-500 transition">Join Orders</a>
+              <a href="/connections" className="nav-btn px-3 py-1 text-gray-700 hover:text-orange-500 transition">Connections</a>
 
-      {/* Notification Bell */}
-<div
-  className="nav-btn notification"
-  style={{ position: "relative", cursor: "pointer" }}
-  ref={dropdownRef} // ✅ Wrap bell + dropdown together
->
-  <span onClick={() => setShowDropdown(!showDropdown)}>🔔</span>
-  {requests.length > 0 && (
-    <span
-      style={{
-        position: "absolute",
-        top: "-5px",
-        right: "-5px",
-        backgroundColor: "red",
-        color: "white",
-        borderRadius: "50%",
-        padding: "2px 6px",
-        fontSize: "12px",
-      }}
-    >
-      {requests.length}
-    </span>
-  )}
-
-  {/* Dropdown */}
-  {showDropdown && (
-    <div
-      style={{
-        position: "absolute",
-        top: "25px",
-        right: "0",
-        backgroundColor: "#fff",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-        borderRadius: "6px",
-        zIndex: 100,
-        width: "240px",
-      }}
-    >
-      {requests.length === 0 ? (
-        <p style={{ padding: "10px" }}>No new requests</p>
-      ) : (
-        requests.map((req) => (
-          <div
-            key={req._id}
-            style={{
-              padding: "8px 10px",
-              borderBottom: "1px solid #ddd",
-            }}
-          >
-            <p style={{ margin: "0 0 5px 0" }}>
-              {req.senderName || "Unknown User"} wants to join your order.
-            </p>
-
-            {showContactFormFor === req._id ? (
-              <div>
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  value={contactInfo.email || userEmail}
-                  onChange={(e) =>
-                    setContactInfo({ ...contactInfo, email: e.target.value })
-                  }
-                  style={{ width: "100%", marginBottom: "5px" }}
-                />
-                <input
-                  type="text"
-                  placeholder="Your phone"
-                  value={contactInfo.phone || ""}
-                  onChange={(e) =>
-                    setContactInfo({ ...contactInfo, phone: e.target.value })
-                  }
-                  style={{ width: "100%", marginBottom: "5px" }}
-                />
+              {/* Notifications */}
+              <div className="relative" ref={notifRef}>
                 <button
-                  onClick={() => handleAccept(req._id, contactInfo)}
-                  style={{ marginRight: "5px" }}
+                  className="relative p-2 rounded-full hover:bg-gray-100 transition"
+                  onClick={() => setShowNotifDropdown(!showNotifDropdown)}
                 >
-                  Submit
+                  🔔
+                  {requests.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full animate-pulse">
+                      {requests.length}
+                    </span>
+                  )}
                 </button>
-                <button onClick={() => setShowContactFormFor(null)}>
-                  Cancel
-                </button>
+                {showNotifDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg z-50 p-2 max-h-80 overflow-y-auto">
+                    {requests.length === 0 ? (
+                      <p className="text-gray-500 p-2">No new requests</p>
+                    ) : (
+                      requests.map((req) => (
+                        <div key={req._id} className="border-b border-gray-200 p-2 text-sm">
+                          <p className="font-semibold">{req.senderName || "Unknown User"}</p>
+                          <p>wants to join your order.</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
-            ) : (
+
+              {/* My Orders */}
+              <div className="relative" ref={ordersRef}>
+                <button
+                  className="nav-btn px-3 py-1 text-gray-700 hover:text-orange-500 transition"
+                  onClick={() => setShowOrdersDropdown(!showOrdersDropdown)}
+                >
+                  My Orders ▼
+                </button>
+                {showOrdersDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg z-50 p-2 max-h-80 overflow-y-auto">
+                    <MyOrders token={token} />
+                  </div>
+                )}
+              </div>
+
               <button
-                onClick={() => setShowContactFormFor(req._id)}
-                style={{ marginRight: "5px" }}
+                className="nav-btn px-3 py-1 text-gray-700 hover:text-orange-500 transition"
+                onClick={handleLogout}
               >
-                Accept
-              </button>
-            )}
-
-            <button onClick={() => handleReject(req._id)}>Reject</button>
-          </div>
-        ))
-      )}
-    </div>
-  )}
-</div>
-
-
-              {/* My Orders dropdown */}
-              <div className="nav-btn dropdown">
-                <span>My Orders ▼</span>
-                <div className="dropdown-content">
-                  <MyOrders token={token} />
-                </div>
-              </div>
-
-              {/* Logout Button */}
-              <button className="nav-btn logout" onClick={handleLogout}>
                 Logout
               </button>
             </>
           ) : (
             <>
-              <a href="/login" className="nav-btn">Login</a>
-              <a href="/register" className="nav-btn register">Register</a>
+              <a href="/login" className="nav-btn px-3 py-1 text-gray-700 hover:text-orange-500 transition">Login</a>
+              <a href="/register" className="nav-btn px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition">Register</a>
             </>
           )}
         </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="hero">
-        <div className="hero-text">
-          <h1>
-            Share Food Orders, <span className="highlight">Save Money</span>
+      <div className="hero flex flex-col md:flex-row items-center justify-between p-10 bg-white shadow-sm mt-6 mx-6 rounded-lg">
+        <div className="hero-text flex-1 mb-6 md:mb-0">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            Share Food Orders, <span className="text-orange-500">Save Money</span>
           </h1>
-          <p>
+          <p className="text-gray-600 mb-6">
             Join people nearby to share bulk discounts from Swiggy, Zomato & more.
             Order together, save together, and enjoy great food!
           </p>
-          <div className="hero-buttons">
-            <a href="/share-order" className="btn-primary">Generate Order</a>
-            <a href="/dashboard" className="btn-secondary">Find Order</a>
+          <div className="flex space-x-4">
+            <a href="/share-order" className="px-5 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition">Generate Order</a>
+            <a href="/dashboard" className="px-5 py-2 border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-500 hover:text-white transition">Find Order</a>
           </div>
         </div>
-
-        <div className="hero-image">
-          <img src="https://via.placeholder.com/400x250" alt="Food Sharing" />
+        <div className="hero-image flex-1">
+          {/* Add hero image if available */}
         </div>
       </div>
 
       {/* Flow Chart Section */}
-      <section className="flow-chart">
-        <h2>How OrderBuddy Works</h2>
-        <div className="flow-steps">
-          <div className="step">
-            <span className="step-icon">🔑</span>
+      <section className="flow-chart bg-orange-50 p-10 mt-8 mx-6 rounded-lg">
+        <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">How OrderBuddy Works</h2>
+        <div className="flow-steps flex flex-wrap justify-center gap-6">
+          <div className="step text-center max-w-xs">
+            <span className="step-icon text-white bg-orange-500 w-12 h-12 flex items-center justify-center rounded-full mx-auto mb-2">🔑</span>
             <p>Login or Register</p>
           </div>
-          <div className="step">
-            <span className="step-icon">📦</span>
+          <div className="step text-center max-w-xs">
+            <span className="step-icon text-white bg-orange-500 w-12 h-12 flex items-center justify-center rounded-full mx-auto mb-2">📦</span>
             <p>Find or Generate Order</p>
           </div>
-          <div className="step">
-            <span className="step-icon">📍</span>
+          <div className="step text-center max-w-xs">
+            <span className="step-icon text-white bg-orange-500 w-12 h-12 flex items-center justify-center rounded-full mx-auto mb-2">📍</span>
             <p>Partner with Nearby Users</p>
           </div>
-          <div className="step">
-            <span className="step-icon">🍽️</span>
+          <div className="step text-center max-w-xs">
+            <span className="step-icon text-white bg-orange-500 w-12 h-12 flex items-center justify-center rounded-full mx-auto mb-2">🍽️</span>
             <p>Save Money & Enjoy</p>
           </div>
         </div>
