@@ -1,3 +1,11 @@
+/* For variable font (recommended for Tailwind) */
+@import "@fontsource-variable/inter"; /* ✅ correct */
+
+
+/* Or for regular weight fonts */
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
