@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MyOrders from "./MyOrders";
-import "tailwindcss";
+// import "tailwindcss";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -145,6 +145,8 @@ export default function Home() {
           {/* Add hero image if available */}
         </div>
       </div>
+
+  
 
       {/* Flow Chart Section */}
       <section className="flow-chart bg-orange-50 p-10 mt-8 mx-6 rounded-lg">

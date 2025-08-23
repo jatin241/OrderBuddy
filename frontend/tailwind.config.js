@@ -6,23 +6,20 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        inter: ['Inter', 'ui-sans-serif', 'system-ui'],
-      },
       animation: {
-        'gradient-slow': 'gradientBG 16s ease infinite',
-        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(.35,.97,.82,.91) both',
+        'float': 'float 4s ease-in-out infinite',
+        'float-slow': 'float-slow 6s ease-in-out infinite',
       },
       keyframes: {
-        gradientBG: {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-15px)' },
         },
-        fadeInUp: {
-          '0%': { opacity: 0, transform: 'translateY(40px)' },
-          '100%': { opacity: 1, transform: 'none' },
-        },
-      },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        }
+      }
     },
   },
   plugins: [],

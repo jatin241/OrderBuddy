@@ -1,16 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-
-// ✅ Import font here
-import '@fontsource/inter';
-
-// Import global CSS
-import './index.css'
-
+import "./index.css";
 import App from './App.jsx'
+// import '@fontsource/inter/variable.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
-  </StrictMode>
+  </StrictMode>,
 )

@@ -1,15 +1,12 @@
-/* For variable font (recommended for Tailwind) */
-/* @import "@fontsource-variable/inter"; ✅ correct */
+/* Fonts */
 
-
-/* Or for regular weight fonts */
-
-
-
+/* Tailwind Directives */
+@import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-15px); }
