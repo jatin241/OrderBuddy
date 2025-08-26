@@ -17,7 +17,7 @@ export default function Home() {
     if (!isLoggedIn) return;
     const fetchRequests = async () => {
       try {
-        const res = await api.get("/orders/buddy-requests");
+        const res = await api.get("/api/orders/buddy-requests");
         setRequests(res.data || []);
       } catch (err) {
         console.error("Failed to fetch buddy requests:", err.response?.data || err.message);
@@ -45,6 +45,30 @@ export default function Home() {
     localStorage.removeItem("userId");
     setIsLoggedIn(false);
     navigate("/");
+  };
+
+  const handleAccept = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.post(`/api/orders/buddy-requests/${id}/accept`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRequests(requests.filter((req) => req._id !== id));
+    } catch (err) {
+      console.error("Error accepting request:", err);
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.post(`/api/orders/buddy-requests/${id}/reject`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRequests(requests.filter((req) => req._id !== id));
+    } catch (err) {
+      console.error("Error rejecting request:", err);
+    }
   };
 
   return (
@@ -96,6 +120,20 @@ export default function Home() {
                         <div key={req._id} className="border-b border-gray-200 p-2 text-sm">
                           <p className="font-semibold">{req.senderName || "Unknown User"}</p>
                           <p>wants to join your order.</p>
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              className="px-3 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600 transition"
+                              onClick={() => handleAccept(req._id)}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              className="px-3 py-1 rounded bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
+                              onClick={() => handleReject(req._id)}
+                            >
+                              Reject
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}

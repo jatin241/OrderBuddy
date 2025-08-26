@@ -9,7 +9,7 @@ function MyOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await api.get("/orders/my-orders"); // No hardcoded URL
+        const res = await api.get("/api/orders/my-orders"); 
         setOrders(res.data.orders);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch orders");

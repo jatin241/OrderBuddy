@@ -13,7 +13,7 @@ export default function Notifications() {
     const fetchRequests = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await api.get("/api/buddy/requests", {
+        const res = await api.get("/api/orders/buddy-requests", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRequests(res.data);
@@ -30,7 +30,7 @@ export default function Notifications() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await api.post(`/api/buddy/accept/${id}`, formData, {
+      await api.post(`/api/orders/buddy-requests/${id}/accept`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRequests(requests.filter((req) => req._id !== id)); // remove after accept
@@ -45,7 +45,7 @@ export default function Notifications() {
   const handleReject = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await api.post(`/api/buddy/reject/${id}`, {}, {
+      await api.post(`/api/orders/buddy-requests/${id}/reject`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRequests(requests.filter((req) => req._id !== id)); // remove after reject
@@ -102,9 +102,19 @@ export default function Notifications() {
                     </button>
                   </form>
                 ) : (
-                  <div className="request-actions">
-                    <button onClick={() => setActiveForm(r._id)}>Accept</button>
-                    <button onClick={() => handleReject(r._id)}>Reject</button>
+                  <div className="request-actions flex gap-2 mt-2">
+                    <button
+                      className="px-3 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600 transition"
+                      onClick={() => setActiveForm(r._id)}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      className="px-3 py-1 rounded bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
+                      onClick={() => handleReject(r._id)}
+                    >
+                      Reject
+                    </button>
                   </div>
                 )}
               </div>
