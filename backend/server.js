@@ -38,6 +38,11 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/connections", connectionsRoutes);
 
+// filepath: d:\webdev\fullStack\orderbuddy\backend\server.js
+app.get('/api/protected', (req, res) => {
+  res.json({ message: "This is a protected route!" });
+});
+
 app.get('/', (req, res) => {
     res.send('OrderBuddy API is running...');
 });
