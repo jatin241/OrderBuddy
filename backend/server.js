@@ -10,8 +10,28 @@ const ordersRoutes = require('./routes/ordersRoutes');
 const connectionsRoutes = require("./routes/connectionsRoutes");
 
 const app = express();
+
+// ✅ Configure CORS
+const allowedOrigins = [
+    "https://order-buddy-8nue-jatins-projects-ab84bc35.vercel.app", // Your Vercel frontend URL
+    "http://localhost:5173" // For local development
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, false);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, origin); // Echo back the allowed origin
+        } else {
+            return callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+}));
+
+// Middleware
 app.use(express.json());
-app.use(cors());
 
 // Routes
 app.use('/api/orders', ordersRoutes);
@@ -22,7 +42,7 @@ app.get('/', (req, res) => {
     res.send('OrderBuddy API is running...');
 });
 
-// Connect to MongoDB
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log('MongoDB connected');

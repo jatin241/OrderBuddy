@@ -9,7 +9,7 @@ export default function Connections() {
     const fetchConnections = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5000/api/connections", {
+        const res = await fetch("orderbuddy-production.up.railway.app", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch connections");

@@ -1,5 +1,5 @@
-// src/components/MyOrders.jsx
 import React, { useEffect, useState } from "react";
+import api from "./api"; // Import centralized axios instance
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -9,22 +9,10 @@ function MyOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem("token"); // assuming token is stored here
-        const res = await fetch("http://localhost:5000/api/orders/my-orders", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch orders");
-        }
-
-        const data = await res.json();
-        setOrders(data.orders);
+        const res = await api.get("/orders/my-orders"); // No hardcoded URL
+        setOrders(res.data.orders);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.message || "Failed to fetch orders");
       } finally {
         setLoading(false);
       }

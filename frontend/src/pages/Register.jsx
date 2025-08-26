@@ -1,10 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import api from "./api"; // ✅ Use centralized Axios instance
 
 export default function Register() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
-  const [showPassword, setShowPassword] = useState(false); // ✅ toggle state
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -16,9 +16,12 @@ export default function Register() {
     e.preventDefault();
     setMessage("");
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
+      // ✅ Use API instance (baseURL comes from VITE_API_BASE_URL)
+      const res = await api.post("/api/auth/register", formData);
       setMessage(res.data.message);
       setFormData({ name: "", email: "", password: "" });
+
+      // ✅ Redirect to login after success
       navigate("/login");
     } catch (err) {
       setMessage(err.response?.data?.message || "Registration failed");
@@ -27,7 +30,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-orange-50 relative overflow-hidden">
-      {/* Food pattern SVG */}
+      {/* Background pattern */}
       <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
         <defs>
           <pattern id="foodPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">

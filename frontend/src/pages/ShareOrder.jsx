@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "./api"; // ✅ Import centralized Axios instance
 
 export default function ShareOrder() {
   const [formData, setFormData] = useState({
@@ -12,21 +12,21 @@ export default function ShareOrder() {
   const [toast, setToast] = useState({ message: "", visible: false });
   const navigate = useNavigate();
 
-  // Get user location on component mount
+  // ✅ Get user location on component mount
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          setLocation(prev => ({ ...prev, lat: latitude, lng: longitude }));
+          setLocation((prev) => ({ ...prev, lat: latitude, lng: longitude }));
 
-          // Optional: Get human-readable address
+          // ✅ Fetch human-readable address using OpenStreetMap
           try {
             const res = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
             );
             const data = await res.json();
-            setLocation(prev => ({ ...prev, address: data.display_name }));
+            setLocation((prev) => ({ ...prev, address: data.display_name }));
           } catch (err) {
             console.error("Failed to fetch address:", err);
           }
@@ -57,13 +57,13 @@ export default function ShareOrder() {
 
     const dataToSend = {
       restaurant: formData.restaurant,
-      items: formData.items.split(",").map(item => item.trim()),
+      items: formData.items.split(",").map((item) => item.trim()),
       deliveryTime: formData.deliveryTime,
       location: {
         type: "Point",
         coordinates: [location.lng, location.lat],
-        address: location.address
-      }
+        address: location.address,
+      },
     };
 
     const token = localStorage.getItem("token");
@@ -73,8 +73,9 @@ export default function ShareOrder() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/orders", dataToSend, {
-        headers: { Authorization: `Bearer ${token}` }
+      // ✅ Use centralized API instance
+      const res = await api.post("/api/orders", dataToSend, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setToast({ message: res.data.message, visible: true });
@@ -84,9 +85,11 @@ export default function ShareOrder() {
         setToast({ message: "", visible: false });
         navigate("/dashboard");
       }, 2000);
-
     } catch (error) {
-      setToast({ message: error.response?.data?.message || "Failed to share order.", visible: true });
+      setToast({
+        message: error.response?.data?.message || "Failed to share order.",
+        visible: true,
+      });
     }
   };
 
@@ -96,18 +99,38 @@ export default function ShareOrder() {
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Restaurant:</label><br />
-          <input type="text" name="restaurant" value={formData.restaurant} onChange={handleChange} required />
+          <label>Restaurant:</label>
+          <br />
+          <input
+            type="text"
+            name="restaurant"
+            value={formData.restaurant}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div>
-          <label>Items (comma separated):</label><br />
-          <input type="text" name="items" value={formData.items} onChange={handleChange} required />
+          <label>Items (comma separated):</label>
+          <br />
+          <input
+            type="text"
+            name="items"
+            value={formData.items}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div>
-          <label>Delivery Time:</label><br />
-          <input type="text" name="deliveryTime" value={formData.deliveryTime} onChange={handleChange} />
+          <label>Delivery Time:</label>
+          <br />
+          <input
+            type="text"
+            name="deliveryTime"
+            value={formData.deliveryTime}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Show detected location */}
@@ -120,17 +143,19 @@ export default function ShareOrder() {
       </form>
 
       {toast.visible && (
-        <div style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "8px",
-          boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
-          zIndex: 1000
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: "#4CAF50",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
+            zIndex: 1000,
+          }}
+        >
           {toast.message}
         </div>
       )}

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "./api"; // ✅ Centralized Axios instance
 import "./PageLayout.css";
-
 
 export default function Notifications() {
   const [requests, setRequests] = useState([]);
@@ -14,7 +13,7 @@ export default function Notifications() {
     const fetchRequests = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/buddy/requests", {
+        const res = await api.get("/api/buddy/requests", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRequests(res.data);
@@ -31,13 +30,9 @@ export default function Notifications() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:5000/api/buddy/accept/${id}`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await api.post(`/api/buddy/accept/${id}`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setRequests(requests.filter((req) => req._id !== id)); // remove after accept
       setActiveForm(null);
       setFormData({ email: "", phone: "" });
@@ -50,13 +45,9 @@ export default function Notifications() {
   const handleReject = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:5000/api/buddy/reject/${id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await api.post(`/api/buddy/reject/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setRequests(requests.filter((req) => req._id !== id)); // remove after reject
     } catch (err) {
       console.error("Error rejecting request:", err);

@@ -8,6 +8,7 @@ import { Bell } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import Lottie from "lottie-react";
 import burgerAnimation from "../assets/Burger.json";
+import api from "./api";
 
 // Fix Leaflet default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,7 +31,7 @@ export default function Dashboard() {
   const userId = localStorage.getItem("userId");
   const mapRef = useRef();
 
-  // Parallax effect for shapes
+  // ✅ Parallax effect
   useEffect(() => {
     const handleScroll = () => {
       const shapes = document.querySelectorAll(".abstract-shape");
@@ -61,19 +62,26 @@ export default function Dashboard() {
             const { latitude, longitude } = position.coords;
             setUserLocation([latitude, longitude]);
 
-            const resProtected = await axios.get(
-              "http://localhost:5000/api/auth/protected",
-              { headers: { Authorization: `Bearer ${token}` } }
+            // ✅ Protected endpoint request
+            const resProtected = await api.get(
+              "https://orderbuddy-production.up.railway.app/api/protected",
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
             );
             setMessage(resProtected.data.message);
 
-            const resOrders = await axios.get(
-              `http://localhost:5000/api/orders?lat=${latitude}&lng=${longitude}`,
-              { headers: { Authorization: `Bearer ${token}` } }
+            // ✅ Orders API
+            const resOrders = await api.get(
+              `https://orderbuddy-production.up.railway.app/api/orders?lat=${latitude}&lng=${longitude}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
             );
             setOrders(resOrders.data.orders);
           } catch (err) {
-            setError("Failed to fetch data. Try again.");
+            console.error(err);
+            setError(err.response?.data?.message || "Failed to fetch data");
           } finally {
             setLoading(false);
           }
@@ -89,9 +97,9 @@ export default function Dashboard() {
 
   const handleBuddyUp = async (orderId) => {
     const token = localStorage.getItem("token");
-    try {
-      const res = await axios.post(
-        `http://localhost:5000/api/orders/buddy-request/${orderId}`,
+    try{
+      const res = await api.post(
+        `https://orderbuddy-production.up.railway.app/api/orders/buddy-request/${orderId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -116,7 +124,7 @@ export default function Dashboard() {
 
   return (
     <div className="relative min-h-screen w-full bg-gradient-to-tr from-orange-50 via-yellow-50 to-orange-100 overflow-hidden font-inter">
-      {/* Abstract Background Shapes */}
+      {/* Background Shapes */}
       <div className="absolute inset-0 pointer-events-none -z-10">
         <div className="abstract-shape absolute top-[-100px] left-[-100px] w-96 h-96 bg-gradient-to-tr from-orange-200 via-yellow-300 to-orange-400 opacity-30 rounded-full blur-3xl"></div>
         <div className="abstract-shape absolute bottom-[-80px] right-[-80px] w-72 h-72 bg-gradient-to-tr from-yellow-200 via-orange-300 to-yellow-400 opacity-25 rounded-full blur-2xl"></div>
@@ -188,7 +196,7 @@ export default function Dashboard() {
               <p className="text-gray-500">No shared orders nearby.</p>
             ) : (
               <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6">
-                {orders.map((order, i) => (
+                {orders.map((order) => (
                   <div
                     key={order._id}
                     className="bg-white/50 backdrop-blur-lg rounded-2xl shadow-lg border border-orange-100 p-6 flex flex-col justify-between relative hover:scale-105 transition-all duration-300"
