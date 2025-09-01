@@ -13,7 +13,7 @@ const app = express();
 
 // ✅ Configure CORS
 const allowedOrigins = [
-    "https://order-buddy-8nue-jatins-projects-ab84bc35.vercel.app", // Your Vercel frontend URL
+    "https://order-buddy-pz7i.vercel.app", // Your Vercel frontend URL
     "http://localhost:5173" // For local development
 ];
 
