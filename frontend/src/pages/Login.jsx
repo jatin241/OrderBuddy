@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "./api"; // ✅ Import centralized Axios instance
+import axios from "axios";
+
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -16,7 +18,7 @@ export default function Login() {
     setMessage("");
     try {
       // ✅ Use centralized API instance
-      const res = await api.post("/api/auth/login", formData);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, formData);
       const { token, user } = res.data;
 
       localStorage.setItem("token", token);

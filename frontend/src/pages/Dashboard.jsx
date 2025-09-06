@@ -81,6 +81,8 @@ export default function Dashboard() {
             setOrders(resOrders.data.orders);
           } catch (err) {
             console.error(err);
+            console.log(message);
+            
             setError(err.response?.data?.message || "Failed to fetch data");
           } finally {
             setLoading(false);

@@ -12,19 +12,15 @@ const connectionsRoutes = require("./routes/connectionsRoutes");
 const app = express();
 
 
-app.use(cors());
-
 // ✅ Middleware
 app.use(express.json());
+app.use(cors())
 
 // ✅ Routes
 app.use('/api/orders', ordersRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/connections", connectionsRoutes);
 
-app.get('/api/protected', (req, res) => {
-  res.json({ message: "This is a protected route!" });
-});
 
 app.get('/', (req, res) => {
     res.send('OrderBuddy API is running...');

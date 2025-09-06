@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "./api"; // ✅ Use centralized Axios instance
+import axios from "axios";
 
 export default function Register() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -17,7 +18,7 @@ export default function Register() {
     setMessage("");
     try {
       // ✅ Use API instance (baseURL comes from VITE_API_BASE_URL)
-      const res = await api.post(`/api/auth/register`, formData);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, formData);
       setMessage(res.data.message);
       setFormData({ name: "", email: "", password: "" });
 
