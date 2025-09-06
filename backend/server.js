@@ -11,23 +11,8 @@ const connectionsRoutes = require("./routes/connectionsRoutes");
 
 const app = express();
 
-// ✅ Configure CORS
-const allowedOrigins = [
-    "https://order-buddy-pz7i.vercel.app", // Vercel frontend
-    "http://localhost:5173"                // Local dev
-];
 
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);   // ✅ allow
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200
-}));
+app.use(cors());
 
 // ✅ Middleware
 app.use(express.json());
