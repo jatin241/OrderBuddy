@@ -17,7 +17,7 @@ export default function Register() {
     setMessage("");
     try {
       // ✅ Use API instance (baseURL comes from VITE_API_BASE_URL)
-      const res = await api.post("/api/auth/register", formData);
+      const res = await api.post(`${process.env.VITE_API_BASE_URL}/api/auth/register`, formData);
       setMessage(res.data.message);
       setFormData({ name: "", email: "", password: "" });
 
